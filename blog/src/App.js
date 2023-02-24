@@ -1,21 +1,33 @@
-import logo from "./logo.svg";
+import { useState } from "react";
 import "./App.css";
 
 function App() {
+  let post = "코드 추천";
+  let [글제목, b] = useState(["남자", "여자", "유아"]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>hello world! start 2023 02 24</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="black-nav">
+        <h4>ReactBlog</h4>
+      </div>
+      <div className="list">
+        <h4>
+          {글제목[0]} {post}
+        </h4>
+        <p> 2월 17일 발행</p>
+      </div>
+      <div className="list">
+        <h4>
+          {글제목[1]} {post}
+        </h4>
+        <p> 2월 17일 발행</p>
+      </div>
+      <div className="list">
+        <h4>
+          {글제목[2]} {post}
+        </h4>
+        <p> 2월 17일 발행</p>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,25 @@
+3.1 JSX문법1
+- class  넣을땐 className
+
+3.2 JSX문법2
+- 변수 꽂을 땐 {변수명}
+
+3.3 JSX문법3
+- style 넣을 땐 style={ { 이름 : '값' } }
+
+4.1 return() 안에는 병렬로 태그 2개이상 금지
+
+4.2 state 만드는 법
+1) import { useState } from "react";
+2) useState("보관할 자료")
+3) let [작명1, 작명2] (작명1 : state에 보관했던 자료 나옴, 작명2 : state 변경 도와주는 함수)
+ex)  let [a, b] = useState("남자 코드 추천");
+
+// (참고) Destructuring 문법
+let num = [1, 2];
+let a = num[0];
+let c = num[1];
+let [a, c] = [1, 2];
+
+4.3 state 언제써야함?
+- 변동시 자동으로 html에 반영되게 만들고 싶으면 state 쓰셈
