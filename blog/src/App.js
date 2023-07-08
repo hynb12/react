@@ -14,11 +14,16 @@ function App() {
     "강남 우동 맛집",
     "파이썬독학",
   ]);
-  let [따봉, 따봉변경] = useState(0);
+  let [따봉, 따봉변경] = useState([21, 32, 44]);
+  let [modal, setModal] = useState(false);
 
-  function 함수() {
-    따봉변경(따봉 + 1);
-  }
+  // [].map()
+  // 1. array 자료 갯수만큼 함수안의 코드 실행해줌
+  // 2. 함수의 파라미터는 array안에 있던 자료임
+  // 3. retrun에 뭐 적으면 array로 담아줌
+  [1, 2, 3].map(function (a) {
+    return "1251221";
+  });
 
   function 함수2() {
     // array, object 자료 다룰 때는 원본 데이터를 직접 조작하는 것 보다는
@@ -43,6 +48,16 @@ function App() {
     글제목변경(copy);
   }
 
+  const openModal = () => {
+    // 간단하게 setModal(!modal) 이래도 됩니다.
+    // 느낌표 우측 자료를 반대로 바꿔줍니다.
+    // !true는 출력해보면 false입니다.
+    // !false는 출력해보면 true입니다.
+    setModal(!modal);
+  };
+
+  const likes = () => {};
+
   return (
     // JSX 문법 1. html에 class 넣을 땐 className
 
@@ -63,10 +78,16 @@ function App() {
       </div>
       <button onClick={함수2}>🤣변경</button>
       <button onClick={함수3}>가나다순정렬</button>
-      <div className="list">
-        <h4>
+      {/* <div className="list">
+        <h4 onClick={openModal}>
           {글제목[0]}
-          <span onClick={함수}>👍</span>
+          <span
+            onClick={() => {
+              따봉변경(따봉 + 1);
+            }}
+          >
+            👍
+          </span>
           {따봉}
         </h4>
         <p>2월 17일 발행</p>
@@ -78,9 +99,78 @@ function App() {
       <div className="list">
         <h4>{글제목[2]}</h4>
         <p>2월 17일 발행</p>
-      </div>
+      </div> */}
+
+      {글제목.map(function (a, b) {
+        return (
+          <div className="list" key={b}>
+            <h4>
+              <span onClick={openModal}>{a}</span>
+              <span
+                onClick={() => {
+                  //  state가 array자료일 경우 복사부터 하고
+                  // 그거 수정하면 된다고 해서 그렇게 했습니다.
+                  let copy = [...따봉];
+                  copy[b] = copy[b] + 1;
+                  따봉변경(copy);
+                }}
+              >
+                👍
+                {따봉[b]}
+              </span>
+            </h4>
+
+            <p>{b}월 17일 발행</p>
+          </div>
+        );
+      })}
+
+      {modal == true ? <Modal></Modal> : null}
+      <Modal2 />
     </div>
   );
 }
+
+// 유형1
+function Modal() {
+  return (
+    // 컴포넌트 만드는법
+    // 1. function 만들고
+    // 2. return()안에 html담기
+    // 3. <함수명></함수명> 쓰기
+
+    // 어떤걸 컴포넌트로 만들면좋은가?
+    // 1. 반복적인 html축약할 때
+    // 2. 큰 페이지들
+    // 3. 자주변경되는 것들
+
+    // 컴포넌트의 단점 : state 가져다쓸 때 문제생김
+    // (A함수에 있던 변수는, B함수에서 마음대로 가져다 쓸 수 없음)
+
+    // (참고1) 의미없는 <div>대신 <></> 사용가능
+    // (참고2) <함수명></함수명>, <함수명/> 둘다가능
+
+    // [동적인 UI 만드는 step]
+    // 1. html css로 미리 디자인 완성
+    // 2. UI의 현재 상태를 state로 저장
+    // 3. state에 따라 UI가 어떻게 보일지 작성
+    <>
+      <div className="modal">
+        <h4>제목</h4>
+        <p>날짜</p>
+        <p>상세내용</p>
+      </div>
+    </>
+  );
+}
+
+// 유형2
+const Modal2 = () => {
+  return (
+    <div className="modal">
+      <h4>제목2</h4>
+    </div>
+  );
+};
 
 export default App;
