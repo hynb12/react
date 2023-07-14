@@ -16,6 +16,13 @@ function App() {
   ]);
   let [따봉, 따봉변경] = useState([21, 32, 44]);
   let [modal, setModal] = useState(false);
+  let [titleNum, setTitleNum] = useState(0);
+  let [입력값, 입력값변경] = useState("");
+  let [날짜, 날짜변경] = useState([
+    new Date().toString(),
+    new Date().toString(),
+    new Date().toString(),
+  ]);
 
   // [].map()
   // 1. array 자료 갯수만큼 함수안의 코드 실행해줌
@@ -48,15 +55,18 @@ function App() {
     글제목변경(copy);
   }
 
-  const openModal = () => {
+  const openModal = (n) => {
     // 간단하게 setModal(!modal) 이래도 됩니다.
     // 느낌표 우측 자료를 반대로 바꿔줍니다.
     // !true는 출력해보면 false입니다.
     // !false는 출력해보면 true입니다.
-    setModal(!modal);
+    // setModal(!modal);
+    if (titleNum == n && modal == true) {
+      setModal(false);
+    } else {
+      setModal(true);
+    }
   };
-
-  const likes = () => {};
 
   return (
     // JSX 문법 1. html에 class 넣을 땐 className
@@ -101,38 +111,104 @@ function App() {
         <p>2월 17일 발행</p>
       </div> */}
 
-      {글제목.map(function (a, b) {
+      {글제목.map(function (a, i) {
         return (
-          <div className="list" key={b}>
-            <h4>
-              <span onClick={openModal}>{a}</span>
+          <div className="list" key={i}>
+            <h4
+              onClick={() => {
+                openModal(i);
+                setTitleNum(i);
+              }}
+            >
+              {a}
               <span
-                onClick={() => {
+                onClick={(e) => {
+                  // 상위 html로 퍼지는 이벤트 버블링을 막고싶다면
+                  e.stopPropagation();
+
                   //  state가 array자료일 경우 복사부터 하고
                   // 그거 수정하면 된다고 해서 그렇게 했습니다.
                   let copy = [...따봉];
-                  copy[b] = copy[b] + 1;
+                  copy[i] = copy[i] + 1;
                   따봉변경(copy);
                 }}
               >
                 👍
-                {따봉[b]}
               </span>
+              {따봉[i]}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  let copy = [...글제목];
+                  // delete copy[i];
+                  // let newArr = copy.filter((element) => element !== undefined);
+                  // 글제목변경(newArr);
+                  copy.splice(i, 1);
+                  글제목변경(copy);
+
+                  let copy2 = [...따봉];
+                  copy2.splice(i, 1);
+                  따봉변경(copy2);
+
+                  let copy3 = [...날짜];
+                  copy3.splice(i, 1);
+                  날짜변경(copy3);
+                }}
+                style={{ float: "right" }}
+              >
+                삭제
+              </button>
             </h4>
 
-            <p>{b}월 17일 발행</p>
+            <p>{날짜[i]}</p>
           </div>
         );
       })}
 
-      {modal == true ? <Modal></Modal> : null}
+      <input
+        onChange={(e) => {
+          // (정보) state변경 함수는 늦게 처리됨
+          입력값변경(e.target.value); // 늦게처리됨(전문용어로 비동기처리)
+          console.log(입력값);
+        }}
+      ></input>
+      <button
+        onClick={() => {
+          if (입력값 == "") {
+            alert("글을 입력해 주세요");
+          } else {
+            let copy = [...글제목];
+            copy.unshift(입력값);
+            글제목변경(copy);
+
+            let copy2 = [...따봉];
+            copy2.unshift(0);
+            따봉변경(copy2);
+
+            let copy3 = [...날짜];
+            copy3.unshift(new Date().toString());
+            날짜변경(copy3);
+          }
+        }}
+      >
+        글발행
+      </button>
+
+      {modal == true ? (
+        <Modal
+          함수2={함수2}
+          color="orange"
+          글제목={글제목}
+          titleNum={titleNum}
+        ></Modal>
+      ) : null}
       <Modal2 />
     </div>
   );
 }
 
 // 유형1
-function Modal() {
+function Modal(props) {
   return (
     // 컴포넌트 만드는법
     // 1. function 만들고
@@ -155,12 +231,16 @@ function Modal() {
     // 2. UI의 현재 상태를 state로 저장
     // 3. state에 따라 UI가 어떻게 보일지 작성
     <>
-      <div className="modal">
-        <h4>제목</h4>
+      <div className="modal" style={{ background: props.color }}>
+        <h4>{props.글제목[props.titleNum]}</h4>
         <p>날짜</p>
         <p>상세내용</p>
+        <button onClick={props.함수2}>글수정</button>
       </div>
     </>
+    // 부모 > 자식 state 전송하는 법
+    // 1. <자식컴포넌트 작명={states이름}
+    // 2. props 파라미터 등록 후 props.작명 사용
   );
 }
 
