@@ -7,8 +7,18 @@ import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
 import { useState } from "react";
 import data from "./data.js";
+import { Route, Routes, Link } from "react-router-dom";
+
+// 페이지나느눈법(리엑트)
+// 1. 컴포넌트 만들어서 상세페이지 내용 채움
+// 2. 누가 /detail 접속하면 그 컴포넌트 보여줌
 
 function App() {
+  <Routes>
+    <route path="/detail" element={<div>상세페이지임</div>}></route>
+    <route />
+  </Routes>;
+
   let [shoes, setShoes] = useState(data);
 
   return (
