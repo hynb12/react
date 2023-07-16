@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Component, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -203,6 +203,7 @@ function App() {
         ></Modal>
       ) : null}
       <Modal2 />
+      <Modal3 addr="Seoul" />
     </div>
   );
 }
@@ -252,5 +253,32 @@ const Modal2 = () => {
     </div>
   );
 };
+
+// class 문법으로 컴포넌트 만드는 법
+class Modal3 extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: "kim",
+      age: 20,
+    };
+  }
+  render() {
+    return (
+      <div>
+        {this.props.addr} 안녕 {this.state.age}
+        <button
+          onClick={() => {
+            this.setState({
+              age: 21,
+            });
+          }}
+        >
+          버튼
+        </button>
+      </div>
+    );
+  }
+}
 
 export default App;
