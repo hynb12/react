@@ -7,8 +7,16 @@ import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
 import { useState } from "react";
 import data from "./data.js";
-import { Route, Routes, Link, useNavigate, Outlet } from "react-router-dom";
-import Detail from "./routes/Detail.js";
+import {
+  Route,
+  Routes,
+  Link,
+  useNavigate,
+  Outlet,
+  useParams,
+} from "react-router-dom";
+import Card from "./component/Card.js";
+import EventPage from "./routes/EventPage.js";
 
 // 페이지나누는법(리엑트)
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
@@ -57,7 +65,8 @@ function App() {
 
       <Routes>
         <Route path="" element={<MainPage shoes={shoes} />} />
-        <Route path="detail" element={<Detail />} />
+        {/* url 파라미터 detail/:id */}
+        <Route path="detail/:id" element={<Detail shoes={shoes} />} />
         <Route path="about" element={<About />}>
           {/* 
           <Route>안에 <Route>를 넣을 수 있는데 이걸 Nested routes 라고 부릅니다.
@@ -78,23 +87,48 @@ function App() {
   );
 }
 
-const Main = ({ shoes }) => {
+function MainPage({ shoes }) {
+  return (
+    <Container>
+      <Row>
+        {shoes.map((a, i) => {
+          return <Card product={a} idx={i} />;
+        })}
+      </Row>
+    </Container>
+  );
+}
+
+function Detail(props) {
+  // 유저가 URL파라미터에 입력한거 가져오려면
+  let { id } = useParams();
+
   return (
     <>
-      <div
-        className="main-bg"
-        style={{ backgroundImage: `url(${bg.png})` }}
-      ></div>
-      <Container>
-        <Row>
-          {shoes.map((a, i) => {
-            return <Card a={a} i={i} />;
-          })}
-        </Row>
-      </Container>
+      {id >= 0 ? (
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6">
+              <img
+                src={"https://codingapple1.github.io/shop/shoes" + id + ".jpg"}
+                width="100%"
+              />
+            </div>
+            <div className="col-md-6">
+              {/* 현재url에입력한숫자 */}
+              <h4 className="pt-5">{props.shoes[id].title}</h4>
+              <p>{props.shoes[id].content}</p>
+              <p>{props.shoes[id].price}</p>
+              <button className="btn btn-danger">주문하기</button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>없어요</div>
+      )}
     </>
   );
-};
+}
 
 function About() {
   return (
@@ -108,49 +142,5 @@ function About() {
     </div>
   );
 }
-
-function EventPage() {
-  return (
-    <div>
-      <h4>오늘의 이벤트</h4>
-      <Outlet></Outlet>
-    </div>
-  );
-}
-
-function MainPage({ shoes }) {
-  return (
-    <Container>
-      <Row>
-        {shoes.map((a, i) => {
-          return <Card product={a} idx={i} />;
-        })}
-      </Row>
-    </Container>
-  );
-}
-
-function Card(props) {
-  return (
-    <div className="col-md-4">
-      <img
-        src={process.env.PUBLIC_URL + "/img/shoes" + (props.idx + 1) + ".jpg"}
-        width="80%"
-      />
-      <h4>{props.product.title}</h4>
-      <p>{props.product.content}</p>
-      <p>{props.product.price}</p>
-    </div>
-  );
-}
-
-const Event = () => {
-  return (
-    <>
-      <h4>오늘의 이벤트</h4>
-      <Outlet></Outlet>
-    </>
-  );
-};
 
 export default App;
