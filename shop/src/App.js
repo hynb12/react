@@ -7,26 +7,16 @@ import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
 import { useState } from "react";
 import data from "./data.js";
-<<<<<<< HEAD
 import { Route, Routes, Link, useNavigate, Outlet } from "react-router-dom";
 import Detail from "./routes/Detail.js";
-=======
-import { Routes, Route, Link, useNavigate, Outlet } from "react-router-dom";
-import Detail from "./routes/Detail";
-import Card from "./component/Card";
->>>>>>> 4b3c7286875ffc15c5670ac1332cb07eac6b380c
 
 // 페이지나누는법(리엑트)
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
 // 2. 누가 /detail 접속하면 그 컴포넌트 보여줌
 function App() {
   let [shoes, setShoes] = useState(data);
-<<<<<<< HEAD
   //  페이지 이동기능을 만들고 싶으면 useNavigate() 씁니다.
   let navigate = useNavigate();
-=======
-  let navigate = useNavigate(); // 페이지 이동 도와주는 함수
->>>>>>> 4b3c7286875ffc15c5670ac1332cb07eac6b380c
 
   return (
     <div className="App">
@@ -36,10 +26,7 @@ function App() {
           <Nav className="me-auto">
             <Nav.Link
               onClick={() => {
-<<<<<<< HEAD
                 // navigate(-1); // 뒤로가기(-2하면 2번감)
-=======
->>>>>>> 4b3c7286875ffc15c5670ac1332cb07eac6b380c
                 navigate("/");
               }}
             >
@@ -50,7 +37,6 @@ function App() {
                 navigate("/detail");
               }}
             >
-<<<<<<< HEAD
               Detail
             </Nav.Link>
             <Nav.Link
@@ -89,67 +75,6 @@ function App() {
         <Route path="*" element={<div>없는페이지에요</div>} />
       </Routes>
     </div>
-=======
-              detail
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => {
-                navigate("/about");
-              }}
-            >
-              about
-            </Nav.Link>
-            {/* <Nav.Link
-              onClick={() => {
-                navigate(-1);
-              }}
-            >
-              뒤로가기
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => {
-                navigate(1);
-              }}
-            >
-              앞으로가기
-            </Nav.Link> */}
-            <Nav.Link
-              onClick={() => {
-                navigate("/event/one");
-              }}
-            >
-              이벤트1
-            </Nav.Link>
-            <Nav.Link
-              onClick={() => {
-                navigate("/event/two");
-              }}
-            >
-              이벤트2
-            </Nav.Link>
-            {/* <Link to="/"> 홈</Link><Link to="/detail"> 상세</Link> */}
-          </Nav>
-        </Container>
-      </Navbar>
-      <Routes>
-        <Route path="/" element={<Main shoes={shoes} />} />
-        <Route path="/detail/:id" element={<Detail shoes={shoes} />} />
-        <Route path="/about" element={<About />}>
-          {/* 
-          nested route 장점
-          1. router 작성이 간단해짐
-          2. nested route 접속시엔 element 2개나 보임(어디에 보여줄지 잘 작성해야함 Outlet)
-          */}
-          <Route path="member" element={<>멤버임</>} />
-          <Route path="location" element={<>위치정보임</>} />
-        </Route>
-        <Route path="event" element={<Event />}>
-          <Route path="one" element={<>첫 주문시 양배추즙 서비스</>}></Route>
-          <Route path="two" element={<>생일기념 쿠폰 받기</>}></Route>
-        </Route>
-        <Route path="*" element={<>없는 페이지 (404 페이지)</>} />
-      </Routes>
-    </div>
   );
 }
 
@@ -168,11 +93,9 @@ const Main = ({ shoes }) => {
         </Row>
       </Container>
     </>
->>>>>>> 4b3c7286875ffc15c5670ac1332cb07eac6b380c
   );
 };
 
-<<<<<<< HEAD
 function About() {
   return (
     <div>
@@ -218,16 +141,8 @@ function Card(props) {
       <p>{props.product.content}</p>
       <p>{props.product.price}</p>
     </div>
-=======
-const About = () => {
-  return (
-    <>
-      <h4>회사정보임</h4>
-      <Outlet></Outlet>
-    </>
->>>>>>> 4b3c7286875ffc15c5670ac1332cb07eac6b380c
   );
-};
+}
 
 const Event = () => {
   return (
