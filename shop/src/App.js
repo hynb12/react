@@ -5,7 +5,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import data from "./data.js";
 import {
   Route,
@@ -17,6 +17,7 @@ import {
 } from "react-router-dom";
 import Card from "./component/Card.js";
 import EventPage from "./routes/EventPage.js";
+import styled from "styled-components";
 
 // 페이지나누는법(리엑트)
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
@@ -42,7 +43,7 @@ function App() {
             </Nav.Link>
             <Nav.Link
               onClick={() => {
-                navigate("/detail");
+                navigate("/detail/1");
               }}
             >
               Detail
@@ -99,14 +100,72 @@ function MainPage({ shoes }) {
   );
 }
 
+// styled-components
+// 장점1. CSS 파일 오픈할 필요없이 JS 파일에서 바로 스타일넣을 수 있습니다.
+// 장점2. 여기 적은 스타일이 다른 JS 파일로 오염되지 않습니다. 원래 그냥 CSS파일은 오염됩니다.
+// 장점3. 페이지 로딩시간 단축됩니다.
+// 실은 일반 CSS 파일도 오염방지 가능 "컴포넌트명.module.css" 이렇게 CSS 파일을 작명하면 됩니다.
+let ColorBtn = styled.button`
+  background: ${(props) => props.bg};
+  color: ${(props) => (props.bg == "blue" ? "white" : "black")};'
+  padding: 10px;
+`;
+
+let Box = styled.div`
+  background: grey;
+  padding: 20px;
+`;
+
 function Detail(props) {
   // 유저가 URL파라미터에 입력한거 가져오려면
   let { id } = useParams();
+
+  // 밖에다 써도 작동하긴함
+  let [outCount, setOutCount] = useState(77);
+  console.log("안녕 outCount:" + outCount);
+
+  // useEffect 안에 적은 코드는 html 렌더링 이후에 동작합니다.
+  let [count, setCount] = useState(0);
+  let [hidden, setHidden] = useState(false);
+
+  // mount, update 할때 실행됨
+  useEffect(() => {
+    console.log("안녕 count:" + count);
+  });
+
+  // [] 가 변할때마다 실행됨, 비워져있으면 mount될때만 실행
+  useEffect(() => {
+    console.log("2");
+    let a = setTimeout(() => {
+      setHidden(true);
+    }, 2000);
+    return () => {
+      // useEffect가 동작 전에 실행되는 clean up function
+      console.log("1");
+      clearTimeout(a); // 기존타이머는 제거해주세요~
+    };
+  }, []);
+
+  // 컴포넌트의 핵심 기능은 html 렌더링이라
+  // 그거 외의 쓸데없는 기능들은 useEffect 안에 적으라는 소리입니다.
+  // 오래걸리는 반복연산, 서버에서 데이터가져오는 작업, 타이머다는거
+  // 이런건 useEffect 안에 많이 적습니다.
 
   return (
     <>
       {id >= 0 ? (
         <div className="container">
+          <Box>
+            <ColorBtn bg="yellow" onClick={() => setCount(++count)}>
+              버튼 : {count}
+            </ColorBtn>
+            <ColorBtn bg="blue" onClick={() => setCount(++count)}>
+              버튼 : {count}
+            </ColorBtn>
+            {hidden ? null : (
+              <ColorBtn bg="orange">2초 후에 안보여야함</ColorBtn>
+            )}
+          </Box>
           <div className="row">
             <div className="col-md-6">
               <img
