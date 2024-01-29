@@ -119,6 +119,12 @@ let Box = styled.div`
 function Detail(props) {
   // 유저가 URL파라미터에 입력한거 가져오려면
   let { id } = useParams();
+  let item = props.shoes.find((e) => {
+    if (e.id == id) return e;
+  });
+  // let 찾은상품 = props.shoes.find(function(x){
+  //   return x.id == id
+  // });
 
   // 밖에다 써도 작동하긴함
   let [outCount, setOutCount] = useState(77);
@@ -169,15 +175,19 @@ function Detail(props) {
           <div className="row">
             <div className="col-md-6">
               <img
-                src={"https://codingapple1.github.io/shop/shoes" + id + ".jpg"}
+                src={
+                  "https://codingapple1.github.io/shop/shoes" +
+                  (Number(id) + 1) +
+                  ".jpg"
+                }
                 width="100%"
               />
             </div>
             <div className="col-md-6">
               {/* 현재url에입력한숫자 */}
-              <h4 className="pt-5">{props.shoes[id].title}</h4>
-              <p>{props.shoes[id].content}</p>
-              <p>{props.shoes[id].price}</p>
+              <h4 className="pt-5">{item?.title}</h4>
+              <p>{item?.content}</p>
+              <p>{item?.price} 원</p>
               <button className="btn btn-danger">주문하기</button>
             </div>
           </div>
