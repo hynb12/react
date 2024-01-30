@@ -15,7 +15,6 @@ import {
   Outlet,
   useParams,
 } from "react-router-dom";
-import Card from "./component/Card.js";
 import EventPage from "./routes/EventPage.js";
 import styled from "styled-components";
 
@@ -93,7 +92,7 @@ function MainPage({ shoes }) {
     <Container>
       <Row>
         {shoes.map((a, i) => {
-          return <Card product={a} idx={i} />;
+          return <Card product={a} key={i} />;
         })}
       </Row>
     </Container>
@@ -130,32 +129,56 @@ function Detail(props) {
   let [outCount, setOutCount] = useState(77);
   console.log("안녕 outCount:" + outCount);
 
-  // useEffect 안에 적은 코드는 html 렌더링 이후에 동작합니다.
   let [count, setCount] = useState(0);
-  let [hidden, setHidden] = useState(false);
+  let [alert, setAlert] = useState(true);
 
+  // useEffect 안에 적은 코드는 html 렌더링 이후에 동작합니다.
   // mount, update 할때 실행됨
+  // 컴포넌트의 핵심 기능은 html 렌더링이라
+  // 그거 외의 쓸데없는 기능들은 useEffect 안에 적으라는 소리입니다.
+  // 오래걸리는 반복연산, 서버에서 데이터가져오는 작업, 타이머다는거
+  // 이런건 useEffect 안에 많이 적습니다.
   useEffect(() => {
     console.log("안녕 count:" + count);
   });
 
   // [] 가 변할때마다 실행됨, 비워져있으면 mount될때만 실행
   useEffect(() => {
-    console.log("2");
+    console.log("2. main");
     let a = setTimeout(() => {
-      setHidden(true);
+      setAlert(false);
     }, 2000);
     return () => {
       // useEffect가 동작 전에 실행되는 clean up function
-      console.log("1");
+      console.log("1. clean up function");
       clearTimeout(a); // 기존타이머는 제거해주세요~
+
+      // clean up function은
+      // mount시 실행안됨, unmount시 실행됨
     };
   }, []);
 
-  // 컴포넌트의 핵심 기능은 html 렌더링이라
-  // 그거 외의 쓸데없는 기능들은 useEffect 안에 적으라는 소리입니다.
-  // 오래걸리는 반복연산, 서버에서 데이터가져오는 작업, 타이머다는거
-  // 이런건 useEffect 안에 많이 적습니다.
+  /**
+   *    - 빡통식 정리시간
+   *    useEffect(()=>{  }) 1. 재렌더링마다 코드 실행하고싶으면
+   *
+   *    useEffect(()=>{  }, []) 2. mount시 1회 코드 실행하고싶으면
+   *
+   *    useEffect(()=>{
+   *      return () => {
+   *          3. unmount시 1회 코드실행하고 싶으면
+   *      }
+   *    })
+   *
+   *    useEffect(()=>{
+   *      return ()=>{
+   *          4. useEffect 실행 전에 뭔가 실행 하려면 언제나 return () => {  }
+   *      }
+   *    }, [])
+   *
+   *    useEffect(()=>{count}) 5. 특정 state변경시에만 실행하려면 [state명]
+   *
+   */
 
   return (
     <>
@@ -168,9 +191,9 @@ function Detail(props) {
             <ColorBtn bg="blue" onClick={() => setCount(++count)}>
               버튼 : {count}
             </ColorBtn>
-            {hidden ? null : (
+            {alert ? (
               <ColorBtn bg="orange">2초 후에 안보여야함</ColorBtn>
-            )}
+            ) : null}
           </Box>
           <div className="row">
             <div className="col-md-6">
@@ -208,6 +231,32 @@ function About() {
       그래서 유사한 서브페이지들이 많이 필요하다면 이렇게 만들어도 됩니다.
       */}
       <Outlet></Outlet>
+    </div>
+  );
+}
+
+function Card(props) {
+  let navigate = useNavigate();
+  return (
+    <div
+      className="col-md-4"
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        navigate(`/detail/${props.product.id}`);
+      }}
+    >
+      <img
+        src={
+          process.env.PUBLIC_URL +
+          "/img/shoes" +
+          (props.product.id + 1) +
+          ".jpg"
+        }
+        width="80%"
+      />
+      <h4>{props.product.title}</h4>
+      <p>{props.product.content}</p>
+      <p>{props.product.price}</p>
     </div>
   );
 }
