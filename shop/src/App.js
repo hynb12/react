@@ -17,6 +17,7 @@ import {
 } from "react-router-dom";
 import EventPage from "./routes/EventPage.js";
 import styled from "styled-components";
+import axios from "axios";
 
 // 페이지나누는법(리엑트)
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
@@ -64,7 +65,7 @@ function App() {
       <Link to="/detail">상세페이지</Link> */}
 
       <Routes>
-        <Route path="" element={<MainPage shoes={shoes} />} />
+        <Route path="/" element={<MainPage shoes={shoes} />} />
         {/* url 파라미터 detail/:id */}
         <Route path="detail/:id" element={<Detail shoes={shoes} />} />
         <Route path="about" element={<About />}>
@@ -88,14 +89,66 @@ function App() {
 }
 
 function MainPage({ shoes }) {
+  const [list, setList] = useState([]);
+  const [page, setPage] = useState(2);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (shoes) {
+      setList(shoes);
+    }
+  }, [shoes]);
+
   return (
-    <Container>
-      <Row>
-        {shoes.map((a, i) => {
-          return <Card product={a} key={i} />;
-        })}
-      </Row>
-    </Container>
+    <>
+      <Container>
+        <Row>
+          {list.map((a, i) => {
+            return <Card product={a} key={i} />;
+          })}
+        </Row>
+        {loading ? <div>loading</div> : null}
+      </Container>
+      <button
+        style={{ visibility: page > 3 ? "hidden" : "none" }}
+        onClick={() => {
+          setLoading(true);
+          axios
+            .get(`https://codingapple1.github.io/shop/data` + page + `.json`)
+            .then((res) => {
+              console.log("res", res.data);
+              setList([...list, ...res.data]);
+              setPage(page + 1);
+            })
+            .catch((error) => {
+              console.log("실패함 ㅅㄱ");
+            })
+            .finally((fin) => {
+              setLoading(false);
+            });
+
+          // 동시에 AJAX 요청 여러개 날리려면
+          // Promise.all([axios.get("URL1"), axios.get("URL2")]).then();
+
+          // 원래 서버와 문자자료만 주고받을 수 있음 (JSON형태)
+
+          // 쌩자바스크립트 문법인 fetch() 를 이용해도 GET/POST 요청이 가능한데
+          // 그건 JSON -> object/array 이렇게 자동으로 안바꿔줘서 직접 바꾸는 작업이 필요합니다.
+          // 마음에 들면 쓰도록 합시다.
+          // fetch('URL').then(결과 => 결과.json()).then((결과) => { console.log(결과) } )
+
+          // 자주묻는 질문 : ajax로 가져온 데이터를 html에 꽂을 때 왜 에러남?
+          // 1. ajax요청으로 데이터를 가져와서
+          // 2. state에 저장하라고 코드를 짜놨고
+          // 3. state를 html에 넣어서 보여달라고 <div> {state.어쩌구} </div> 이렇게 코드 짰습니다.
+          // 잘 될 것 같은데 이 상황에서 state가 텅 비어있다고 에러가 나는 경우가 많습니다.
+          // 이유는 ajax 요청보다 html 렌더링이 더 빨라서 그럴 수 있습니다.
+          // state안에 뭐가 들어있으면 보여달라고 if문 같은걸 추가하거나 그러면 됩니다.
+        }}
+      >
+        더보기
+      </button>
+    </>
   );
 }
 
