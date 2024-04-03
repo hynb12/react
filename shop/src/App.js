@@ -184,6 +184,7 @@ function Detail(props) {
 
   let [count, setCount] = useState(0);
   let [alert, setAlert] = useState(true);
+  let [tab, setTab] = useState(0);
 
   // useEffect 안에 적은 코드는 html 렌더링 이후에 동작합니다.
   // mount, update 할때 실행됨
@@ -237,17 +238,19 @@ function Detail(props) {
     <>
       {id >= 0 ? (
         <div className="container">
-          <Box>
-            <ColorBtn bg="yellow" onClick={() => setCount(++count)}>
-              버튼 : {count}
-            </ColorBtn>
-            <ColorBtn bg="blue" onClick={() => setCount(++count)}>
-              버튼 : {count}
-            </ColorBtn>
-            {alert ? (
-              <ColorBtn bg="orange">2초 후에 안보여야함</ColorBtn>
-            ) : null}
-          </Box>
+          {alert ? (
+            <>
+              <Box>
+                <ColorBtn bg="yellow" onClick={() => setCount(++count)}>
+                  버튼 : {count}
+                </ColorBtn>
+                <ColorBtn bg="blue" onClick={() => setCount(++count)}>
+                  버튼 : {count}
+                </ColorBtn>
+                <ColorBtn bg="orange">2초 후에 안보여야함</ColorBtn>
+              </Box>
+            </>
+          ) : null}
           <div className="row">
             <div className="col-md-6">
               <img
@@ -267,12 +270,37 @@ function Detail(props) {
               <button className="btn btn-danger">주문하기</button>
             </div>
           </div>
+          <>
+            <Nav variant="tabs" defaultActiveKey="link0">
+              <Nav.Item onClick={() => setTab(0)}>
+                <Nav.Link eventKey="link0">버튼0</Nav.Link>
+              </Nav.Item>
+              <Nav.Item onClick={() => setTab(1)}>
+                <Nav.Link eventKey="link1">버튼1</Nav.Link>
+              </Nav.Item>
+              <Nav.Item onClick={() => setTab(2)}>
+                <Nav.Link eventKey="link2">버튼2</Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <TabContent tab={tab} />
+          </>
         </div>
       ) : (
         <div>없어요</div>
       )}
     </>
   );
+}
+
+function TabContent({ tab }) {
+  if (tab == 0) {
+    return <div>내용0</div>;
+  } else if (tab == 1) {
+    return <div>내용1</div>;
+  } else if (tab == 2) {
+    return <div>내용2</div>;
+  }
+  // return [<div>내용0</div>, <div>내용1</div>, <div>내용2</div>][tab];
 }
 
 function About() {
