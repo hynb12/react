@@ -233,9 +233,20 @@ function Detail(props) {
    *    useEffect(()=>{count}) 5. 특정 state변경시에만 실행하려면 [state명]
    *
    */
+  const [fade, setFade] = useState("");
+
+  useEffect(() => {
+    let a = setTimeout(() => {
+      setFade("end");
+    }, 100);
+    return () => {
+      clearTimeout(a);
+      setFade("");
+    };
+  }, [id]);
 
   return (
-    <>
+    <div className={`start ${fade}`}>
       {id >= 0 ? (
         <div className="container">
           {alert ? (
@@ -288,18 +299,42 @@ function Detail(props) {
       ) : (
         <div>없어요</div>
       )}
-    </>
+    </div>
   );
 }
 
 function TabContent({ tab }) {
+  let returnDiv;
+  const [fade, setFade] = useState("");
+  // 애니메이션 만들고 싶으면
+  // 1. 애니메이션 동작 전 스타일을 담을 className 만들기
+  // 2. 애니메이션 동작 후 스타일을 담을 className 만들기
+  // 3. transition 속성도 추가
+  // 4. 원할 때 2번 탈부착
+  useEffect(() => {
+    let a = setTimeout(() => {
+      // Q. setTimeout 왜 씁니까
+      // 리액트 18버전 이상부터는 automatic batch 라는 기능이 생겼습니다.
+      // state 변경함수들이 연달아서 여러개 처리되어야한다면
+      // state 변경함수를 다 처리하고 마지막에 한 번만 재렌더링됩니다.
+      // 그래서 'end' 로 변경하는거랑 ' ' 이걸로 변경하는거랑 약간 시간차를 뒀습니다.
+      // 찾아보면 setTimeout 말고 flushSync() 이런거 써도 될 것 같기도 합니다. automatic batching을 막아줍니다.
+      setFade("end"); // <- 이거 2빠
+    }, 100);
+    return () => {
+      clearTimeout(a);
+      setFade(""); // <- 이거 1빠
+    };
+  }, [tab]);
+
   if (tab == 0) {
-    return <div>내용0</div>;
+    returnDiv = <div>내용0</div>;
   } else if (tab == 1) {
-    return <div>내용1</div>;
+    returnDiv = <div>내용1</div>;
   } else if (tab == 2) {
-    return <div>내용2</div>;
+    returnDiv = <div>내용2</div>;
   }
+  return <div className={`start ${fade}`}>{returnDiv}</div>;
   // return [<div>내용0</div>, <div>내용1</div>, <div>내용2</div>][tab];
 }
 
