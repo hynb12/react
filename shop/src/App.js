@@ -21,6 +21,7 @@ import axios from "axios";
 import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, increaseAge } from "./store.js";
+import { addCart } from "./store/cartSlice.js";
 
 export let Context1 = createContext(); // state 보관함
 
@@ -300,6 +301,8 @@ function Detail(props) {
   // Context API
   let { contextApiStock } = useContext(Context1);
 
+  let dispatch = useDispatch();
+
   return (
     <div className={`start ${fade}`}>
       {id >= 0 ? (
@@ -332,10 +335,17 @@ function Detail(props) {
             </div>
             <div className="col-md-6">
               {/* 현재url에입력한숫자 */}
-              <h4 className="pt-5">{item?.title}</h4>
-              <p>{item?.content}</p>
-              <p>{item?.price} 원</p>
-              <button className="btn btn-danger">주문하기</button>
+              <h4 className="pt-5">{item.title}</h4>
+              <p>{item.content}</p>
+              <p>{item.price} 원</p>
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  dispatch(addCart(item));
+                }}
+              >
+                주문하기
+              </button>
             </div>
           </div>
           <>
@@ -455,9 +465,6 @@ export const Cart = () => {
   let { user, cart } = useSelector((state) => state);
   let dispatch = useDispatch();
 
-  console.log("user", user);
-  console.log("cart", cart);
-
   return (
     <div>
       <h1>
@@ -466,7 +473,7 @@ export const Cart = () => {
       <button
         onClick={() => {
           dispatch(changeName());
-          dispatch(increaseAge(10));
+          dispatch(increaseAge(1));
         }}
       >
         버튼
@@ -489,7 +496,7 @@ export const Cart = () => {
               <td>
                 <button
                   onClick={() => {
-                    dispatch(changeName());
+                    dispatch(addCart(item));
                   }}
                 >
                   +

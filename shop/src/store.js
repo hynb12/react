@@ -1,4 +1,5 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { cart } from "./store/cartSlice";
 
 // Redux store에 state 보관하는 법
 // 저번시간에 만들어둔 store.js 파일 열어서 이렇게 코드짜면 state 하나 만들 수 있습니다.
@@ -21,6 +22,9 @@ let user = createSlice({
   // 2. 다른 곳에서 쓰기좋게 export 해둡니다.
   // 3. 원할 때 import 해서 사용합니다. 근데 dispatch() 로 감싸서 써야함
   reducers: {
+    basicChangeName(state) {
+      return "john " + state;
+    },
     changeName(
       state // 기존 state를 뜻함
     ) {
@@ -46,23 +50,7 @@ let user = createSlice({
   },
 });
 
-export let { changeName, increaseAge } = user.actions;
-
-let cart = createSlice({
-  name: "cart",
-  initialState: [
-    { id: 0, name: "White and Black", count: 2 },
-    { id: 2, name: "Grey Yordan", count: 1 },
-  ],
-
-  reducers: {
-    countUp(state) {
-      return state[0].count++;
-    },
-  },
-});
-
-export let { countUp } = cart.actions;
+export let { basicChangeName, changeName, increaseAge } = user.actions;
 
 export default configureStore({
   reducer: {
