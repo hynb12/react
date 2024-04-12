@@ -5,7 +5,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import data from "./data.js";
 import {
   Route,
@@ -18,6 +18,11 @@ import {
 import EventPage from "./routes/EventPage.js";
 import styled from "styled-components";
 import axios from "axios";
+import { Table } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { changeName, increaseAge } from "./store.js";
+
+export let Context1 = createContext(); // state 보관함
 
 // 페이지나누는법(리엑트)
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
@@ -26,6 +31,29 @@ function App() {
   let [shoes, setShoes] = useState(data);
   //  페이지 이동기능을 만들고 싶으면 useNavigate() 씁니다.
   let navigate = useNavigate();
+
+  // Context API
+  let [contextApiStock] = useState([
+    "Context API 1",
+    "Context API 2",
+    "Context API 3",
+  ]);
+  // 1. 일단 createContext() 함수를 가져와서 context를 하나 만들어줍니다.
+  // context를 쉽게 비유해서 설명하자면 state 보관함입니다.
+  // 2. 아까만든 Context1로 원하는 곳을 감싸고 공유를 원하는 state를 value 안에 다 적으면 됩니다.
+  // 그럼 이제 Context1로 감싼 모든 컴포넌트와 그 자식컴포넌트는
+  // state를 props 전송없이 직접 사용가능합니다.
+  //
+  // ** Context 안에 있던 state 사용하려면
+  // 1. 만들어둔 Context를 import 해옵니다.
+  // 2. useContext() 안에 넣습니다.
+  // 그럼 이제 그 자리에 공유했던 state가 전부 남는데 그거 쓰면 됩니다.
+  //
+  // ** Context API 단점
+  // 실은 잘 안쓰는 이유는
+  // 1. state 변경시 쓸데없는 컴포넌트까지 전부 재렌더링이 되고
+  // 2. useContext() 를 쓰고 있는 컴포넌트는 나중에 다른 파일에서 재사용할 때 Context를 import 하는게 귀찮아질 수 있습니다.
+  // 그래서 이것 보다는 redux 같은 외부라이브러리를 많이들 사용합니다.
 
   return (
     <div className="App">
@@ -41,6 +69,7 @@ function App() {
             >
               Home
             </Nav.Link>
+
             <Nav.Link
               onClick={() => {
                 navigate("/detail/1");
@@ -48,12 +77,21 @@ function App() {
             >
               Detail
             </Nav.Link>
+
             <Nav.Link
               onClick={() => {
                 navigate("/event");
               }}
             >
               Event
+            </Nav.Link>
+
+            <Nav.Link
+              onClick={() => {
+                navigate("/cart");
+              }}
+            >
+              Cart
             </Nav.Link>
             {/* <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/detail">detail</Nav.Link> */}
@@ -66,8 +104,18 @@ function App() {
 
       <Routes>
         <Route path="/" element={<MainPage shoes={shoes} />} />
+
         {/* url 파라미터 detail/:id */}
-        <Route path="detail/:id" element={<Detail shoes={shoes} />} />
+        <Route
+          path="detail/:id"
+          element={
+            // Context API
+            <Context1.Provider value={{ contextApiStock }}>
+              <Detail shoes={shoes} />
+            </Context1.Provider>
+          }
+        />
+
         <Route path="about" element={<About />}>
           {/* 
           <Route>안에 <Route>를 넣을 수 있는데 이걸 Nested routes 라고 부릅니다.
@@ -77,10 +125,14 @@ function App() {
           <Route path="member" element={<div>멤버임</div>} />
           <Route path="location" element={<About />} />
         </Route>
+
         <Route path="event" element={<EventPage />}>
           <Route path="one" element={<p>첫 주문시 양배추즙 서비스</p>} />
           <Route path="two" element={<p>생일기념 쿠폰받기</p>} />
         </Route>
+
+        <Route path="/cart" element={<Cart />} />
+
         {/* 404페이지는 */}
         <Route path="*" element={<div>없는페이지에요</div>} />
       </Routes>
@@ -245,6 +297,9 @@ function Detail(props) {
     };
   }, [id]);
 
+  // Context API
+  let { contextApiStock } = useContext(Context1);
+
   return (
     <div className={`start ${fade}`}>
       {id >= 0 ? (
@@ -262,7 +317,9 @@ function Detail(props) {
               </Box>
             </>
           ) : null}
-          <div className="row">
+
+          {contextApiStock[0]}
+          <div className="row mb-5">
             <div className="col-md-6">
               <img
                 src={
@@ -327,15 +384,29 @@ function TabContent({ tab }) {
     };
   }, [tab]);
 
-  if (tab == 0) {
-    returnDiv = <div>내용0</div>;
-  } else if (tab == 1) {
-    returnDiv = <div>내용1</div>;
-  } else if (tab == 2) {
-    returnDiv = <div>내용2</div>;
-  }
-  return <div className={`start ${fade}`}>{returnDiv}</div>;
-  // return [<div>내용0</div>, <div>내용1</div>, <div>내용2</div>][tab];
+  // if (tab == 0) {
+  //   returnDiv = <div>내용0</div>;
+  // } else if (tab == 1) {
+  //   returnDiv = <div>내용1</div>;
+  // } else if (tab == 2) {
+  //   returnDiv = <div>내용2</div>;
+  // }
+  // return <div className={`start ${fade}`}>{returnDiv}</div>;
+
+  // Context API
+  let { contextApiStock } = useContext(Context1);
+
+  return (
+    <div className={`start ${fade}`}>
+      {
+        [
+          <div>내용0 : {contextApiStock[0]}</div>,
+          <div>내용1</div>,
+          <div>내용2</div>,
+        ][tab]
+      }
+    </div>
+  );
 }
 
 function About() {
@@ -376,5 +447,60 @@ function Card(props) {
     </div>
   );
 }
+
+// 장바구니
+export const Cart = () => {
+  // Redux store에 있던 state 가져다쓰는 법
+  // 아무 컴포넌트에서 useSelector((state) => { return state } ) 쓰면 store에 있던 모든 state가 그 자리에 남습니다.
+  let { user, cart } = useSelector((state) => state);
+  let dispatch = useDispatch();
+
+  console.log("user", user);
+  console.log("cart", cart);
+
+  return (
+    <div>
+      <h1>
+        {user.name}({user.age})의 장바구니
+      </h1>
+      <button
+        onClick={() => {
+          dispatch(changeName());
+          dispatch(increaseAge(10));
+        }}
+      >
+        버튼
+      </button>
+      <Table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>상품명</th>
+            <th>수량</th>
+            <th>변경하기</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cart.map((item, index) => (
+            <tr key={index}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.count}</td>
+              <td>
+                <button
+                  onClick={() => {
+                    dispatch(changeName());
+                  }}
+                >
+                  +
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
 
 export default App;
