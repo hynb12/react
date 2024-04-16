@@ -29,6 +29,17 @@ export let Context1 = createContext(); // state 보관함
 // 1. 컴포넌트 만들어서 상세페이지 내용 채움
 // 2. 누가 /detail 접속하면 그 컴포넌트 보여줌
 function App() {
+  // localStorage에 array/object 자료를 저장하려면
+  // 문자만 저장할 수 있는 공간이라 array/object를 바로 저장할 수는 없습니다.
+  // 강제로 저장해보면 문자로 바꿔서 저장해주는데 그럼 array/object 자료가 깨져서 저장됩니다.
+  // 그래서 편법이 하나 있는데 array/object -> JSON 이렇게 변환해서 저장하면 됩니다.
+  // JSON은 문자취급을 받아서 그렇습니다.
+  // JSON은 그냥 따옴표친 array/object 자료입니다.
+  // let obj = {name : 'kim'};
+  // localStorage.setItem('data', JSON.stringify(obj));
+  // let getData = localStorage.getItem('data')
+  // console.log('getData:', JSON.parse(getData).name)
+
   let [shoes, setShoes] = useState(data);
   //  페이지 이동기능을 만들고 싶으면 useNavigate() 씁니다.
   let navigate = useNavigate();
@@ -248,6 +259,17 @@ function Detail(props) {
   useEffect(() => {
     console.log("안녕 count:" + count);
   });
+
+  useEffect(() => {
+    let watched = JSON.parse(localStorage.getItem("watched")) ?? [];
+    watched.push(item.id);
+
+    //Set으로 바꿨다가 다시 array로 만들기
+    watched = new Set(watched);
+    watched = Array.from(watched);
+
+    localStorage.setItem("watched", JSON.stringify(watched));
+  }, []);
 
   // [] 가 변할때마다 실행됨, 비워져있으면 mount될때만 실행
   useEffect(() => {
