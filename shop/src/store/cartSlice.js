@@ -10,7 +10,7 @@ export let cart = createSlice({
   reducers: {
     addCart(state, action) {
       let item = action.payload;
-      let index = state.findIndex((e) => e.id == item.id);
+      let index = state.findIndex((e) => e.id === item.id);
       if (index > -1) {
         state[index].count += 1;
       } else {

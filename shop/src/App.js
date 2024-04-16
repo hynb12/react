@@ -10,7 +10,6 @@ import data from "./data.js";
 import {
   Route,
   Routes,
-  Link,
   useNavigate,
   Outlet,
   useParams,
@@ -22,6 +21,7 @@ import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, increaseAge } from "./store.js";
 import { addCart } from "./store/cartSlice.js";
+import { useQuery } from "react-query";
 
 export let Context1 = createContext(); // state 보관함
 
@@ -67,6 +67,24 @@ function App() {
   // 2. useContext() 를 쓰고 있는 컴포넌트는 나중에 다른 파일에서 재사용할 때 Context를 import 하는게 귀찮아질 수 있습니다.
   // 그래서 이것 보다는 redux 같은 외부라이브러리를 많이들 사용합니다.
 
+  // React-Query
+  // 장점1. ajax 요청 성공/실패/로딩중 상태를 쉽게 파악할 수 있습니다.
+  // 장점2. 틈만나면 알아서 ajax 재요청해줍니다.
+  // 장점3. 실패시 재시도 알아서 해줌
+  // 장점4. ajax로 가져온 결과는 state 공유 필요없음
+  // 장점5. ajax 결과 캐싱기능
+  let result = useQuery(
+    "userdata",
+    () =>
+      axios.get("https://codingapple1.github.io/userdata.json").then((a) => {
+        console.log("요청됨");
+        return a.data;
+      }),
+    { staleTime: 2000 }
+  );
+
+  console.log("result : ", result);
+
   return (
     <div className="App">
       <Navbar bg="light" data-bs-theme="light">
@@ -107,6 +125,11 @@ function App() {
             </Nav.Link>
             {/* <Nav.Link href="/">Home</Nav.Link>
             <Nav.Link href="/detail">detail</Nav.Link> */}
+          </Nav>
+          <Nav className="ms-auto">
+            {result.isLoading && "로딩중"}
+            {result.error && "에러남"}
+            {result.data && result.data.name}
           </Nav>
         </Container>
       </Navbar>
@@ -223,7 +246,7 @@ function MainPage({ shoes }) {
 // 실은 일반 CSS 파일도 오염방지 가능 "컴포넌트명.module.css" 이렇게 CSS 파일을 작명하면 됩니다.
 let ColorBtn = styled.button`
   background: ${(props) => props.bg};
-  color: ${(props) => (props.bg == "blue" ? "white" : "black")};'
+  color: ${(props) => (props.bg === "blue" ? "white" : "black")};'
   padding: 10px;
 `;
 
@@ -236,7 +259,7 @@ function Detail(props) {
   // 유저가 URL파라미터에 입력한거 가져오려면
   let { id } = useParams();
   let item = props.shoes.find((e) => {
-    if (e.id == id) return e;
+    if (e.id === id) return e;
   });
   // let 찾은상품 = props.shoes.find(function(x){
   //   return x.id == id
@@ -393,7 +416,7 @@ function Detail(props) {
 }
 
 function TabContent({ tab }) {
-  let returnDiv;
+  // let returnDiv;
   const [fade, setFade] = useState("");
   // 애니메이션 만들고 싶으면
   // 1. 애니메이션 동작 전 스타일을 담을 className 만들기
