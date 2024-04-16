@@ -660,9 +660,9 @@ function App2() {
       />
       {isPending
         ? "로딩중"
-        : app2TestArray.map(() => {
+        : app2TestArray.map((e, i) => {
             return (
-              <div>
+              <div key={i}>
                 name : {name}, state : {state}
               </div>
             );
