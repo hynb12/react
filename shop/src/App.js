@@ -14,6 +14,8 @@ import {
   Suspense,
   memo,
   useMemo,
+  useTransition,
+  useDeferredValue,
 } from "react";
 import data from "./data.js";
 import {
@@ -628,8 +630,45 @@ export const Cart = () => {
           ))}
         </tbody>
       </Table>
+      <App2 />
     </div>
   );
 };
+
+let app2TestArray = new Array(100).fill(0);
+
+function App2() {
+  let [name, setName] = useState("");
+
+  let [isPending, startTrasition] = useTransition();
+  // - useTransition() 쓰면 그 자리에 [변수, 함수]가 남습니다.
+  // - 그 중 우측에 있는 startTransition() 함수로 state변경함수 같은걸 묶으면
+  // 그걸 다른 코드들보다 나중에 처리해줍니다.
+  // isPending은 어디다 쓰냐면, startTransition() 으로 감싼 코드가 처리중일 때 true로 변하는 변수입니다.
+  // useDeferredValue 이것도 비슷함
+  // - useDeferredValue 안에 state를 집어넣으면 그 state가 변동사항이 생겼을 때 나중에 처리해줍니다.
+  let state = useDeferredValue(name);
+
+  return (
+    <div>
+      <input
+        onChange={(e) => {
+          startTrasition(() => {
+            setName(e.target.value);
+          });
+        }}
+      />
+      {isPending
+        ? "로딩중"
+        : app2TestArray.map(() => {
+            return (
+              <div>
+                name : {name}, state : {state}
+              </div>
+            );
+          })}
+    </div>
+  );
+}
 
 export default App;
