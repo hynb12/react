@@ -259,7 +259,7 @@ function Detail(props) {
   // 유저가 URL파라미터에 입력한거 가져오려면
   let { id } = useParams();
   let item = props.shoes.find((e) => {
-    if (e.id === id) return e;
+    if (e.id == id) return e;
   });
   // let 찾은상품 = props.shoes.find(function(x){
   //   return x.id == id
