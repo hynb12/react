@@ -5,7 +5,16 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import bg from "./img/bg.png";
 import Row from "react-bootstrap/Row";
-import { useState, useEffect, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  lazy,
+  Suspense,
+  memo,
+  useMemo,
+} from "react";
 import data from "./data.js";
 import {
   Route,
@@ -14,7 +23,6 @@ import {
   Outlet,
   useParams,
 } from "react-router-dom";
-import EventPage from "./routes/EventPage.js";
 import styled from "styled-components";
 import axios from "axios";
 import { Table } from "react-bootstrap";
@@ -22,6 +30,26 @@ import { useDispatch, useSelector } from "react-redux";
 import { changeName, increaseAge } from "./store.js";
 import { addCart } from "./store/cartSlice.js";
 import { useQuery } from "react-query";
+
+// import EventPage from "./routes/EventPage.js";
+const EventPage = lazy(() => import("./routes/EventPage.js"));
+// lazy import
+// 리액트 코드 다 짰으면 npm run build 입력해서
+// 여러분이 짰던 이상한 코드들을 역사와 전통의 html css js 파일로 변환해야합니다.
+// 근데 리액트로 만드는 Single Page Application의 특징은 html, js 파일이 하나만 생성됩니다.
+// 그 안에 지금까지 만든 App / Detail / Cart 모든 내용이 들어있어서 파일사이즈가 좀 큽니다.
+// 원래 그래서 리액트 사이트들은 첫 페이지 로딩속도가 매우 느릴 수 있습니다.
+// 그게 싫다면 js 파일을 잘게 쪼개면 됩니다.
+// lazy 문법으로도 똑같이 import가 가능한데 이 경우엔
+// "Detail 컴포넌트가 필요해지면 import 해주세요" 라는 뜻이 됩니다.
+// 그리고 이렇게 해놓으면 Detail 컴포넌트 내용을 다른 js 파일로 쪼개줍니다.
+// 그래서 첫 페이지 로딩속도를 향상시킬 수 있습니다.
+//
+// lazy 사용하면 당연히 Detail 컴포넌트 로드까지 지연시간이 발생할 수 있습니다. 그럴 땐
+// 1. Suspense 라는거 import 해오고
+// 2. Detail 컴포넌트를 감싸면
+// Detail 컴포넌트가 로딩중일 때 대신 보여줄 html 작성도 가능합니다.
+// 귀찮으면 <Suspense> 이걸로 <Routes> 전부 감싸도 됩니다.
 
 export let Context1 = createContext(); // state 보관함
 
@@ -136,41 +164,42 @@ function App() {
       <div className="main-bg" style={{ backgroundImage: `url(${bg})` }}></div>
       {/* <Link to="/">홈</Link>
       <Link to="/detail">상세페이지</Link> */}
+      <Suspense fallback={<div>로딩중입니다</div>}>
+        <Routes>
+          <Route path="/" element={<MainPage shoes={shoes} />} />
 
-      <Routes>
-        <Route path="/" element={<MainPage shoes={shoes} />} />
+          {/* url 파라미터 detail/:id */}
+          <Route
+            path="detail/:id"
+            element={
+              // Context API
+              <Context1.Provider value={{ contextApiStock }}>
+                <Detail shoes={shoes} />
+              </Context1.Provider>
+            }
+          />
 
-        {/* url 파라미터 detail/:id */}
-        <Route
-          path="detail/:id"
-          element={
-            // Context API
-            <Context1.Provider value={{ contextApiStock }}>
-              <Detail shoes={shoes} />
-            </Context1.Provider>
-          }
-        />
-
-        <Route path="about" element={<About />}>
-          {/* 
+          <Route path="about" element={<About />}>
+            {/* 
           <Route>안에 <Route>를 넣을 수 있는데 이걸 Nested routes 라고 부릅니다.
           /about/member 
           /about/location
           */}
-          <Route path="member" element={<div>멤버임</div>} />
-          <Route path="location" element={<About />} />
-        </Route>
+            <Route path="member" element={<div>멤버임</div>} />
+            <Route path="location" element={<About />} />
+          </Route>
 
-        <Route path="event" element={<EventPage />}>
-          <Route path="one" element={<p>첫 주문시 양배추즙 서비스</p>} />
-          <Route path="two" element={<p>생일기념 쿠폰받기</p>} />
-        </Route>
+          <Route path="event" element={<EventPage />}>
+            <Route path="one" element={<p>첫 주문시 양배추즙 서비스</p>} />
+            <Route path="two" element={<p>생일기념 쿠폰받기</p>} />
+          </Route>
 
-        <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<Cart />} />
 
-        {/* 404페이지는 */}
-        <Route path="*" element={<div>없는페이지에요</div>} />
-      </Routes>
+          {/* 404페이지는 */}
+          <Route path="*" element={<div>없는페이지에요</div>} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }
@@ -503,18 +532,66 @@ function Card(props) {
   );
 }
 
+// 1. memo를 import 해와서
+// 2. 원하는 컴포넌트 정의부분을 감싸면 됩니다.
+// 근데 컴포넌트를 let 컴포넌트명 = function( ){ } 이런 식으로 만들어야 감쌀 수 있습니다.
+// 그럼 이제 Child로 전송되는 props가 변하거나 그런 경우에만 재렌더링됩니다.
+// Q. 어 그럼 memo는 좋은거니까 막써도 되겠네요?
+// memo로 감싼 컴포넌트는 헛된 재렌더링을 안시키려고
+// 기존 props와 바뀐 props를 비교하는 연산이 추가로 진행됩니다.
+// props가 크고 복잡하면 이거 자체로도 부담이 될 수도 있습니다.
+// 그래서 꼭 필요한 곳에만 사용합시다.
+let Child = memo(function () {
+  // Cart 컴포넌트 안에 Child 컴포넌트를 만들었습니다.
+  // 그리고 버튼누를 때 Cart 컴포넌트가 재렌더링되게 만들어놨는데
+  // 이 경우 <Child> 이것도 재렌더링됩니다.
+  console.log("재랜더링됨");
+  return <div>자식임</div>;
+});
+
+function fnUseMemo() {
+  // 10억번 돌린결과
+  return 235235235235235235;
+}
+
 // 장바구니
 export const Cart = () => {
   // Redux store에 있던 state 가져다쓰는 법
   // 아무 컴포넌트에서 useSelector((state) => { return state } ) 쓰면 store에 있던 모든 state가 그 자리에 남습니다.
   let { user, cart } = useSelector((state) => state);
   let dispatch = useDispatch();
+  let [count, setCount] = useState(0);
+
+  // 비슷하게 생긴 useMemo
+  // 비슷한 useMemo라는 문법도 있는데 이건 그냥 useEffect와 비슷한 용도입니다.
+  // 컴포넌트 로드시 1회만 실행하고 싶은 코드가 있으면 거기 담으면 됩니다.
+  let result = useMemo(
+    // 1. 예를 들어서 반복문을 10억번 돌려야하는 경우
+    // 2. 그 함수를 useMemo 안에 넣어두면 컴포넌트 로드시 1회만 실행됩니다.
+    // 그럼 재렌더링마다 동작안하니까 좀 효율적으로 동작하겠죠?
+    // useEffect 처럼 dependency도 넣을 수 있어서
+    // 특정 state, props가 변할 때만 실행할 수도 있습니다.
+    () => {
+      return fnUseMemo();
+    }
+    // ,[state]
+  );
 
   return (
     <div>
-      <h1>
+      <Child
+      // count={count}
+      ></Child>
+      <button
+        onClick={() => {
+          setCount(count + 1);
+        }}
+      >
+        +
+      </button>
+      <h3>
         {user.name}({user.age})의 장바구니
-      </h1>
+      </h3>
       <button
         onClick={() => {
           dispatch(changeName());
